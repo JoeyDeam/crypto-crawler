@@ -1,0 +1,28 @@
+name: 📡 Telegram 每日广播
+
+on:
+  schedule:
+    - cron: "0 1 * * *"     # 9:00 北京时间
+    - cron: "0 4 * * *"     # 12:00 北京时间
+    - cron: "10 7 * * *"    # 15:10 北京时间
+  workflow_dispatch:
+
+jobs:
+  broadcast:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装依赖
+        run: pip install requests
+
+      - name: 广播日报
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python telegram_broadcast.py
