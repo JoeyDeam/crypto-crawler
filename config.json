@@ -1,0 +1,5 @@
+{
+  "pushplus_token": "你的PushPlus_token_在这里填写",
+  "coins": ["bitcoin", "ethereum", "dogecoin"],
+  "vs_currency": "usd"
+}

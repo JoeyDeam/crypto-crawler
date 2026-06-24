@@ -1,0 +1,33 @@
+name: 📊 币圈+黄金日报推送
+
+on:
+  schedule:
+    # 北京时间 9:00 = UTC 1:00
+    - cron: "0 1 * * *"
+    # 北京时间 12:00 = UTC 4:00
+    - cron: "0 4 * * *"
+    # 北京时间 15:10 = UTC 7:10
+    - cron: "10 7 * * *"
+  # 手动触发（方便测试）
+  workflow_dispatch:
+
+jobs:
+  push_report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装依赖
+        run: pip install requests
+
+      - name: 运行日报推送
+        env:
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+          PYTHONIOENCODING: utf-8
+        run: python daily_report.py
