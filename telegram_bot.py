@@ -5,6 +5,7 @@
 """
 
 import asyncio
+import io
 import json
 import os
 import sys
@@ -184,7 +185,13 @@ async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ═══════════════════════════════════════════════════════════
 
 def main():
-    print("🐢 龟龟行情 Bot 启动中…")
+    # Fix console encoding for emoji on Windows
+    if sys.platform == "win32":
+        try:
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
     app = Application.builder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", cmd_start))
@@ -192,7 +199,7 @@ def main():
     app.add_handler(CommandHandler("report", cmd_report))
     app.add_handler(CommandHandler("help", cmd_help))
 
-    print("✅ Bot 已上线！去 Telegram 给你的 Bot 发 /start 试试")
+    print("Bot online! Go to Telegram and send /start")
     app.run_polling()
 
 
