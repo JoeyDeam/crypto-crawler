@@ -4,3 +4,10 @@ __pycache__/
 *.png
 *.jsonl
 .DS_Store
+
+# ⚠️ 私钥文件 — 永远不提交
+wallets.json
+airdrop_log.txt
+
+# 日报配置（含 token）
+config.json

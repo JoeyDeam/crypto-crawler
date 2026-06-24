@@ -1,0 +1,29 @@
+name: 🧑‍🌾 空投撸毛
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"   # 每 6 小时跑一轮
+  workflow_dispatch:
+
+jobs:
+  farm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装依赖
+        run: pip install requests web3
+
+      - name: 恢复钱包
+        env:
+          WALLETS_JSON: ${{ secrets.WALLETS_JSON }}
+        run: echo "$WALLETS_JSON" > wallets.json
+
+      - name: 执行撸毛
+        run: python airdrop_farmer.py schedule
