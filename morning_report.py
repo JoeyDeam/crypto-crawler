@@ -40,14 +40,13 @@ def load_config():
 # ═══════════════════════════════════════════
 
 NEWS_SOURCES = [
-    ("CoinDesk",    "https://www.coindesk.com/arc/outboundfeeds/rss/"),
-    ("CoinTelegraph", "https://cointelegraph.com/rss"),
-    ("Decrypt",     "https://decrypt.co/feed"),
-    ("The Block",   "https://www.theblock.co/rss/feed"),
+    ("Google全球",  "https://news.google.com/rss/topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRGx1YlY4U0FtVnVHZ0pWVXlnQVAB?hl=zh-CN&gl=CN&ceid=CN:zh-Hans"),
+    ("BBC中文",     "https://www.bbc.com/zhongwen/simp/index.xml"),
+    ("Google综合",  "https://news.google.com/rss?hl=zh-CN&gl=CN&ceid=CN:zh-Hans"),
 ]
 
 def fetch_news(limit=10):
-    """聚合多源 RSS，返回 Top N 热点新闻"""
+    """聚合中文全球热点新闻 RSS，返回 Top N"""
     all_news = []
     seen = set()
 
@@ -59,12 +58,14 @@ def fetch_news(limit=10):
                 link = entry.get("link", "").strip()
                 if not title or not link:
                     continue
-                # 去重（相似标题）
-                key = title[:50].lower()
+                # 去重
+                key = title[:40]
                 if key in seen:
                     continue
                 seen.add(key)
-                # 提取发布时间
+                # 清理 Google News 标题中的来源后缀
+                title = title.split(" - ")[0].strip()
+                # 发布时间
                 published = ""
                 if hasattr(entry, "published_parsed") and entry.published_parsed:
                     try:
@@ -77,13 +78,12 @@ def fetch_news(limit=10):
                     "source": source_name,
                     "published": published,
                 })
-                if len(all_news) >= limit * 3:  # 多捞一点去重后取 top N
+                if len(all_news) >= limit * 3:
                     break
         except Exception as e:
-            print(f"  [{source_name}] 抓取失败: {e}")
+            print(f"  [{source_name}] 失败: {e}")
             continue
 
-    # 取前 N 条
     return all_news[:limit]
 
 
@@ -169,16 +169,13 @@ def format_report(news, products):
     lines.append("")
 
     # ── 新闻 ──
-    lines.append("📰 全球加密币热点 Top 10")
+    lines.append("📰 全球热点新闻 Top 10")
     lines.append("-" * 35)
     for i, n in enumerate(news, 1):
         title = n["title"][:80]
-        src = n["source"][:12]
-        pub = f" ({n['published']})" if n.get("published") else ""
+        pub = f" {n['published']}" if n.get("published") else ""
         lines.append(f"{i:2d}. {title}")
-        lines.append(f"    📎 {n['link']}")
-        if pub:
-            lines.append(f"    📅 {src}{pub}")
+        lines.append(f"    {n['link']}")
         lines.append("")
     lines.append("")
 
@@ -196,7 +193,8 @@ def format_report(news, products):
         lines.append("")
 
     lines.append("=" * 35)
-    lines.append("📲 数据: CoinDesk/CoinTelegraph/Decrypt & Amazon")
+    lines.append("📲 新闻源: Google News & BBC 中文")
+    lines.append("📲 商品源: Amazon Best Sellers")
     lines.append("🐢 梦宝早报 · 每日 5:00")
 
     return "\n".join(lines)
