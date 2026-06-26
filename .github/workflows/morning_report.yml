@@ -1,0 +1,28 @@
+name: 🌅 每日早报
+
+on:
+  schedule:
+    # 北京时间 5:00 = UTC 21:00 (前一天)
+    - cron: "0 21 * * *"
+  workflow_dispatch:
+
+jobs:
+  morning:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安装依赖
+        run: pip install requests beautifulsoup4 lxml feedparser
+
+      - name: 运行早报
+        env:
+          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
+          PYTHONIOENCODING: utf-8
+        run: python morning_report.py
